@@ -65,7 +65,7 @@ section {
 .produto, .vantagem {
     display: inline-block;
     margin: 20px;
-    padding: 10px;
+    padding: 15px;
     border: 1px solid var(--cor-azul-real);
     border-radius: 5px;
     width: 200px;
@@ -75,7 +75,8 @@ section {
     width: 100%;
 }
 
-button {
+a.btn{
+    text-decoration: none;
     background-color: var(--cor-botao);
     color: var(--cor-botao-texto);
     border: none;
@@ -84,7 +85,7 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+a.btn:hover {
     background-color: var(--cor-azul-medio);
 }
 
