@@ -54,7 +54,7 @@ nav a {
 nav a:hover{
     transition: 0.5s;
     background-color: var(--cor-azul-medio);
-    color: black;
+    /* color: black; */
 }
 
 section {
