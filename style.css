@@ -99,7 +99,18 @@ footer {
 
     header{
         display:block
-        
+
     }
-    
+    section {
+        padding: 5px;
+        text-align: center;
+}
+    .produto, .vantagem {
+        /* display: inline-block; */
+        margin: 5px 5px;
+        padding: 10px;
+        border: 1px solid var(--cor-azul-real);
+        border-radius: 5px;
+        width: 200px;
+}
 }
