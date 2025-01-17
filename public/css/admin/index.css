@@ -1,0 +1,64 @@
+p{
+    padding: 5px;
+}
+.painel-control{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+a > img{
+    width:35px;
+}
+
+table{
+    border-collapse: collapse;
+    border: 1px solid black;
+
+    width: 100%;
+}
+
+table thead td{
+    text-align: center;
+    background-color: #333;
+    color: white;
+}
+
+table td{
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid black;
+}
+
+a{
+    cursor: pointer;
+}
+
+.imagem {
+    width: 100px;
+    /* height: 100px; */
+    overflow: hidden;
+}
+
+.imagem img{
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+
+.form-submit{
+    cursor: pointer;
+    width: max-content;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    font-weight: 600;
+    opacity: 0.7;
+}
+.form-submit:hover, .form-file:hover{
+    opacity: 1;
+}

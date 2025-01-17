@@ -1,0 +1,14 @@
+<link rel="stylesheet" href="/css/home/index.css">
+
+<section>
+    {{#each produto}}
+    <a href="{{link}}">
+        <div class="card">
+            <img src="/produtos/{{path_foto}}" alt="">
+            <p class="title">{{nome}}</p>
+            <p class="price">{{precoInteiro}} <sup>{{precoDecimal}}</sup> </p>
+        </div>
+    </a>
+    {{/each}}
+</section>
+
