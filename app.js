@@ -42,7 +42,7 @@ app.post('/pesquisa', (req,res)=>{
 })
 
 // outros
-const PORT = 8090
+const PORT = 9090
 app.listen(PORT,()=>{
     console.log(`Servidor rodando em: http://localhost:${PORT}`)
 })

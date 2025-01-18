@@ -18,6 +18,7 @@ header{
     display: flex;
     gap: 20px;
     padding: 10px 30px;
+    height: 62px;
     color: white;
     align-items: center;
     justify-content: space-between;
@@ -49,7 +50,7 @@ header form .btn{
 /* Main  */
 main{
     background-color: lightgray;
-    min-height: calc(100vh - 100px);
+    min-height: calc(100vh - 102px);
     padding: 10px;
 }
 .alert{
@@ -82,9 +83,19 @@ footer{
     text-align: center;
 }
 
+footer a{
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
 @media screen and (max-width:600px) {
     header{
         justify-content: center;
         flex-wrap: wrap;
+        height: 116px;
+    }
+    main {
+        min-height: calc(100vh - 156px);
     }
 }

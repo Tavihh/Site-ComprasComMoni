@@ -62,9 +62,13 @@ router.get('/editar/:id', eAdmin, (req,res)=>{
 router.post('/editar/:id', eAdmin, (req,res)=>{
     User.findOne({where:{id:req.params.id}}).then((user)=>{
         if(user){
+            telefone = req.body.telefone
+            // Remove todos os caracteres não numéricos (incluindo parênteses, hífens e espaços)
+            telefone = telefone.replace(/[^\d]/g, ''); 
             user.update({
                 nome:req.body.nome,
                 sobrenome:req.body.sobrenome,
+                telefone:telefone,
                 email:req.body.email
             }).then(()=>{
                 req.flash('success_msg','Administrador atualizado com sucesso!, faça login novamente')
@@ -105,6 +109,12 @@ router.post('/produto/add', eAdmin, (req, res) => {
             const extensaoValida = ['.jpg', '.jpeg'];
             if (!extensaoValida.some(ext => req.file.filename.toLowerCase().endsWith(ext))) {
                 erros.push({ texto: 'Arquivo inválido. Apenas JPG e JPEG são permitidos' });
+                // Remove o arquivo caso a extensão seja inválida
+                fs.unlink(req.file.path, (err) => {
+                    if (err) {
+                        console.error('Erro ao tentar remover a foto:', err);
+                    }
+                });
             }
         }
 
@@ -112,29 +122,40 @@ router.post('/produto/add', eAdmin, (req, res) => {
         if (erros.length > 0) {
             return res.render('admin/addProduto', { erros });
         }
+        User.findOne({where:{id:req.user.id}}).then((user)=>{
+            if(user){
+                // Salva os dados no banco de dados
+                Produto.create({
+                    nome: req.body.nome.trim(),
+                    preco: req.body.preco,
+                    path_foto: req.file.filename,
+                    link: req.body.link.trim(),
+                    telefone: user.telefone
+                }).then(() => {
+                    req.flash('success_msg', 'Produto salvo');
+                    res.redirect('/admin');
+                }).catch((err) => {
+                    // Remove o arquivo caso ocorra erro no banco
+                    fs.unlink(req.file.path, (err) => {
+                        if (err) {
+                            console.error('Erro ao tentar remover a foto:', err);
+                        }
+                    });
+                    console.log('Erro:',err)
+                    req.flash('error_msg', 'Erro ao salvar o Produto');
+                    res.redirect('/admin/produto/add');
+                });
 
-        // Salva os dados no banco de dados
-        Produto.create({
-            nome: req.body.nome.trim(),
-            preco: req.body.preco,
-            path_foto: req.file.filename,
-            link: req.body.link.trim()
-        }).then(() => {
-            req.flash('success_msg', 'Produto salvo');
-            res.redirect('/admin');
-        }).catch((err) => {
-            // Remove o arquivo caso ocorra erro no banco
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error('Erro ao tentar remover a foto:', err);
-                }
-            });
-            req.flash('error_msg', 'Erro ao salvar o Produto');
-            res.redirect('/admin/produto/add');
-        });
-    });
-});
-
+            } else {
+                req.flash('error_msg','Não foi conseguir alguns dados')
+                res.redirect('/admin/produto/add')
+            }
+        }).catch((err)=>{
+            req.flash('error_msg','Erro ao fazer consulta no banco de dados')
+            res.redirect('/admin/produto/add')
+        })
+    })
+})
 
 router.get('/produto/editar/:id', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.params.id}}).then((produto)=>{
@@ -154,9 +175,9 @@ router.post('/produto/editar/:id', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.params.id}}).then((produto)=>{
         if(produto){
             produto.update({
-                nome:req.body.nome,
+                nome:req.body.nome.trim(),
                 preco:req.body.preco,
-                link:req.body.link
+                link:req.body.link.trim()
             }).then(()=>{
                 req.flash('success_msg','Atualizado com sucesso')
                 res.redirect('/admin')
@@ -193,7 +214,6 @@ router.get('/produto/del/:id', eAdmin,(req,res)=>{
 router.post('/produto/confirmDel', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.body.id}}).then((produto)=>{
         if(produto){
-            console.log(produto)
             fs.promises.rm(path.join(__dirname,`../public/produtos/${produto.toJSON().path_foto}`),{force:true}).then(()=>{
                 produto.destroy().then(()=>{
                     req.flash('success_msg','Produto deletado com sucesso')
@@ -237,21 +257,24 @@ router.get('/cadastrar' , eAdmin, (req, res)=>{
     res.render('admin/cadastrar')
 })
 
+
 router.post('/cadastrar', eAdmin, (req,res)=>{
     // função que capitaliza as palavras
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
-
+    
     let nome = capitalize(req.body.nome.trim())
     let sobrenome = capitalize(req.body.sobrenome.trim())
     let email = req.body.email.trim().toLowerCase()
+    let telefone = req.body.telefone.trim()
+    telefone = telefone.replace(/[^\d]/g, ''); 
     let senha = req.body.senha.trim()
     let senha2 = req.body.senha2.trim()
-
+    
     // verificando os inputs
     let erros = []
-
+    
     if(!nome) {
         erros.push({text:'Nome inválido'})
     }
@@ -260,6 +283,9 @@ router.post('/cadastrar', eAdmin, (req,res)=>{
     }
     if(!email) {
         erros.push({text:'E-mail inválido'})
+    }
+    if(!telefone) {
+        erros.push({text:'Telefone inválido'})
     }
     if(!senha) {
         erros.push({text:'Senha inválida'})
@@ -272,6 +298,9 @@ router.post('/cadastrar', eAdmin, (req,res)=>{
     }
     if(sobrenome.length < 2) {
         erros.push({text:'Sobrenome muito curto'})
+    }
+    if(telefone.length < 9) {
+        erros.push({text:'telefone muito curto'})
     }
     if(senha.length < 8) {
         erros.push({text:'Senha muito curta'})
@@ -290,6 +319,7 @@ router.post('/cadastrar', eAdmin, (req,res)=>{
                         User.create({
                             nome:nome,
                             sobrenome:sobrenome,
+                            telefone:telefone,
                             email:email,
                             senha:senha
                         }).then(()=>{
@@ -317,6 +347,13 @@ router.post('/cadastrar', eAdmin, (req,res)=>{
             res.redirect('/admin/cadastrar')
         })
     }
+})
+
+router.get('/logout', (req,res)=>{
+    req.logout(()=>{
+        req.flash('success_msg','Deslogado com sucesso')
+        res.redirect('/')
+    })
 })
 
 module.exports = router

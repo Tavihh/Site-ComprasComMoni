@@ -15,9 +15,13 @@ const Produto = sequelize.define('produtos',{
         allowNull:false
     },
     link:{
+        type:DataTypes.TEXT
+    },
+    telefone:{
         type:DataTypes.TEXT,
         allowNull:false
     }
+    
 },{freezeTableName:true})
 
 Produto.sync().then(()=>{

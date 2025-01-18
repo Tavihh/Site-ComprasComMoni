@@ -10,7 +10,7 @@ const passport = require('passport')
 // config
     // session
     app.use(session({
-        secret:'comprascomdai',
+        secret:'comprascomMoni',
         resave:true,
         saveUninitialized:true,
     }))
