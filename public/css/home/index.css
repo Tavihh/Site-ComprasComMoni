@@ -4,7 +4,7 @@ section{
     flex-wrap: wrap;
     justify-content: center;
     align-items: start;
-    gap: 5px;
+    gap: 20px 10px;
 }
 a{
     color: black;
@@ -13,7 +13,7 @@ a{
 .card{
     cursor: pointer;
     width: 160px;
-    height: 245px;
+    height: 250px;
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
