@@ -3,6 +3,7 @@ const passport = require('../config/auth')
 const bcrypt = require('bcryptjs')
 const User = require('../models/Users')
 const Produto = require('../models/Produto')
+const Categoria = require('../models/Categoria')
 const { eAdmin } = require('../helpers/eAdmin')
 const { Op } = require('sequelize')
 const path = require('path')
@@ -88,7 +89,10 @@ router.post('/editar/:id', eAdmin, (req,res)=>{
 })
 
 router.get('/produto/add', eAdmin, (req,res)=>{
-    res.render('admin/addProduto')
+    Categoria.findAll().then((categoria)=>{
+        categoria = categoria.map(item => item.toJSON())
+        res.render('admin/addProduto', {categoria})
+    })
 })
 
 router.post('/produto/add', eAdmin, (req, res) => {
@@ -120,7 +124,7 @@ router.post('/produto/add', eAdmin, (req, res) => {
 
         // Se houver erros, renderiza a página novamente
         if (erros.length > 0) {
-            return res.render('admin/addProduto', { erros });
+            return res.render('/admin/produto/add', { erros });
         }
         User.findOne({where:{id:req.user.id}}).then((user)=>{
             if(user){
@@ -130,7 +134,8 @@ router.post('/produto/add', eAdmin, (req, res) => {
                     preco: req.body.preco,
                     path_foto: req.file.filename,
                     link: req.body.link.trim(),
-                    telefone: user.telefone
+                    telefone: user.telefone,
+                    categoria: req.body.categoria,
                 }).then(() => {
                     req.flash('success_msg', 'Produto salvo');
                     res.redirect('/admin');
@@ -157,10 +162,35 @@ router.post('/produto/add', eAdmin, (req, res) => {
     })
 })
 
+router.get('/categoria/add', (req,res)=>{
+    res.render('admin/addCategoria')
+})
+
+router.post('/categoria/add', (req,res)=>{
+    Categoria.create({
+        nome:req.body.nome
+    }).then(()=>{
+        req.flash('success_msg','Categoria criada com sucesso')
+        res.redirect('/admin/produto/add')
+    }).catch((err)=>{
+        req.flash('error_msg','Não foi possivel criar a categoria')
+        res.redirect('/categoria/add')
+    })
+})
+
 router.get('/produto/editar/:id', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.params.id}}).then((produto)=>{
         if(produto){
-            res.render('admin/editProduto', {produto:produto.toJSON()})
+            Categoria.findAll().then((categoria)=>{
+                if(categoria){
+                    categoria = categoria.map(cat => {
+                        cat = cat.toJSON()
+                        cat.selected = cat.id == produto.categoria
+                        return cat
+                    })
+                    res.render('admin/editProduto', {produto:produto.toJSON(), categoria})
+                }
+            })
         } else{
             req.flash('error_msg','Produto não encontrado')
             res.redirect('/')
@@ -177,7 +207,8 @@ router.post('/produto/editar/:id', eAdmin, (req,res)=>{
             produto.update({
                 nome:req.body.nome.trim(),
                 preco:req.body.preco,
-                link:req.body.link.trim()
+                link:req.body.link.trim(),
+                categoria:req.body.categoria
             }).then(()=>{
                 req.flash('success_msg','Atualizado com sucesso')
                 res.redirect('/admin')

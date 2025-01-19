@@ -28,6 +28,14 @@ main form{
     border-radius: inherit;
     background-color: white;
 }
+.div-select{
+    display: flex;
+    flex: auto;
+}
+
+.div-select input{
+    width: min-content;
+}
 
 .form-input{
     width: 100%;

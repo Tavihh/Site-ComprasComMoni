@@ -20,6 +20,10 @@ const Produto = sequelize.define('produtos',{
     telefone:{
         type:DataTypes.TEXT,
         allowNull:false
+    },
+    categoria:{
+        type:DataTypes.NUMBER,
+        allowNull:false
     }
     
 },{freezeTableName:true})
