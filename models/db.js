@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize')
 
 const sequelize = new Sequelize('comprascommoni','root','P@cienc1a',{
-    host:'localhost',
+    host:'147.93.68.67',
     dialect:'mysql',
     logging:false
 })
