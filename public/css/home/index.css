@@ -51,3 +51,9 @@ a{
     
 }
 
+.card-anuncio {
+    background-color: gray;
+    height: 100px;
+    margin-top: 10px;
+    margin: 10px -10px -10px;
+}
