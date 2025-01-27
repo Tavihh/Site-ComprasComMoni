@@ -65,6 +65,8 @@ main form{
 .form-submit{
     cursor: pointer;
     width: 100%;
+    text-align: center;
+    font-size: 0.9em;
     padding: 10px;
     background-color: #333;
     color: white;

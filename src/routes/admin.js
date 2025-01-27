@@ -46,8 +46,8 @@ router.post('/pesquisa', eAdmin, (req,res)=>{
     })
 })
 
-router.get('/editar/:id', eAdmin, (req,res)=>{
-    User.findOne({where:{id:req.params.id}}).then((user)=>{
+router.get('/editar', eAdmin, (req,res)=>{
+    User.findOne({where:{id:req.user.id}}).then((user)=>{
         if(user){
             res.render('admin/editarADM', {user:user.toJSON()})
         } else {
@@ -73,7 +73,7 @@ router.post('/editar/:id', eAdmin, (req,res)=>{
                 email:req.body.email
             }).then(()=>{
                 req.flash('success_msg','Administrador atualizado com sucesso!, faça login novamente')
-                res.redirect('/admin/login')
+                res.redirect('/login')
             }).catch((err)=>{
                 req.flash('error_msg','erro ao atualizar dados')
                 res.redirect('/admin')
@@ -86,6 +86,84 @@ router.post('/editar/:id', eAdmin, (req,res)=>{
         req.flash('error_msg','Não foi possivel fazer a busca no banco de dados')
         res.redirect('/admin')
     })
+})
+
+router.post('/atualizarSenha', (req,res) => {
+    let senha = req.body.senha.trim()
+    let newsenha = req.body.newsenha.trim()
+    let newsenha2 = req.body.newsenha2.trim()
+
+    // verificando os inputs
+    let erros = []
+
+    if(!senha) {
+        erros.push({texto:'Senha inválida'})
+    }
+    if(!newsenha) {
+        erros.push({texto:'Senha inválida'})
+    }
+    if(!newsenha2) {
+        erros.push({texto:'Senha inválida'})
+    }
+    if(newsenha !== newsenha2) {
+        erros.push({texto:'Nova senha digitada errada em um dos campos'})
+    }
+    if(newsenha.length < 8) {
+        erros.push({texto:'Nova Senha muito curta'})
+    }
+    // retornando os erros
+    if(erros.length >= 1) {
+        res.render('usuario/editar', {erros})
+    } else {
+        // verificando se email já existe
+        User.findOne({where:{id:req.user.id}}).then((user)=>{
+            if(user){
+                bcrypt.compare(senha, req.user.senha).then((equal) => {
+                    if (equal) {
+                        // criptografando senha
+                        bcrypt.genSalt(10).then((salt)=>{
+                            bcrypt.hash(newsenha,salt).then((hashsenha)=>{
+                                // salvando usúario
+                                User.update({
+                                    senha:hashsenha
+                                },{where:{id:req.user.id}}).then(()=>{
+                                    // retornando a página de login com novo usúario cadastrado
+                                    req.flash('success_msg','Usúario atualizado com sucesso')
+                                    res.redirect('/admin/editar')
+                                    // tratando erros
+                                }).catch((err) => {
+                                    console.log("Erro ao atualizar a senha de um usúario no banco de dados, Erro:",err.message)
+                                    req.flash('error_msg','Erro interno, tente novamente mais tarde')
+                                    res.redirect('/admin/editar')
+                                })
+                            }).catch((err) => {
+                                console.log('Erro ao gerar o hash da senha no bcrypt, Erro:',err.message)
+                                req.flash('error_msg','Erro interno, tente novamente mais tarde')
+                                res.redirect('/admin/editar')
+                            })
+                        }).catch((err) => {
+                            console.log('Erro ao gerar o salt da senha no bcrypt, Erro:',err.message)
+                            req.flash('error_msg','Erro interno, tente novamente mais tarde')
+                            res.redirect('/admin/editar')
+                        })
+                    } else {
+                        req.flash('error_msg','Senha atual não consta no banco de dados')
+                        res.redirect('/admin/editar')
+                    }
+                }).catch((err) => {
+                    req.flash('error_msg','Não foi possivel comparar sua senha')
+                    res.redirect('/admin/editar')
+                })
+            } else {
+                req.flash('error_msg','Não foi possivel encontrar seu usúario')
+                res.redirect('/admin/editar')
+            }
+        }).catch((err) => {
+            req.flash('error_msg','Não foi possivel verificar sua conta')
+            console.log("erro ao verificar a conta de um usúario no banco de dados, Erro:",err.message)
+            res.redirect('/admin/editar')
+        })
+    }
 })
 
 router.get('/produto/add', eAdmin, (req,res)=>{
@@ -267,27 +345,9 @@ router.post('/produto/confirmDel', eAdmin, (req,res)=>{
     })
 })
 
-router.get('/login', (req, res)=>{
-    if(req.user){
-        res.redirect('/admin')
-    } else {
-        res.render('admin/login')
-    }
-})
-
-router.post('/login', (req,res,next)=>{
-    passport.authenticate('local', {
-        successRedirect:'/admin',
-        failureRedirect:'/admin/login',
-        failureFlash:true
-    })(req,res,next)
-
-})
-
 router.get('/cadastrar' , eAdmin, (req, res)=>{
     res.render('admin/cadastrar')
 })
-
 
 router.post('/cadastrar', eAdmin, (req,res)=>{
     // função que capitaliza as palavras

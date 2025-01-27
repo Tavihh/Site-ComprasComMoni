@@ -1,5 +1,6 @@
-p{
-    padding: 5px;
+h2 {
+    text-align: center;
+    padding: 10px;
 }
 .painel-control{
     display: flex;

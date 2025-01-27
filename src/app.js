@@ -3,6 +3,7 @@ const app = require('./config/config')
 const admin = require('./routes/admin')
 const Produto = require('./models/Produto')
 const { Op } = require('sequelize')
+const passport = require('./config/auth')
 
 process.noDeprecation = true
 // rotas
@@ -39,6 +40,23 @@ app.post('/pesquisa', (req,res)=>{
     }).catch((err)=>{
         res.status(404).send('Ocorreu um erro ao carregar os produtos, tente novamente')
     })
+})
+
+app.get('/login', (req, res)=>{
+    if(req.user){
+        res.redirect('/admin')
+    } else {
+        res.render('home/login')
+    }
+})
+
+app.post('/login', (req,res,next)=>{
+    passport.authenticate('local', {
+        successRedirect:'/admin',
+        failureRedirect:'/login',
+        failureFlash:true
+    })(req,res,next)
+
 })
 
 // outros

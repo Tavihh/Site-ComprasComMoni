@@ -28,8 +28,27 @@
         <input type="text" name="psq" id="psq" placeholder="Pesquisar Produto.." class="psq">
         <input type="submit" value="pesquisar" class="btn">
         </form>
+
+        <button class="button-menu" id="button-menu" onclick="togglebar()">
+            <img src="/img/menu-white.png" alt="img">
+        </button>
     </header>
-    
+    {{!-- NavSide --}}
+    <nav id="nav-side">  
+        <div class="card-perfil">
+            <img src="/img/account.png" alt="img">
+            <p>{{user.nome}} {{user.sobrenome}}</p>
+        </div>
+        <hr>
+        <ul>
+            <li><a href="/admin/"><img src="/img/shield-person.png" alt="img">Painel</a></li>
+            <li><a href="/admin/editar/"><img src="/img/account.png" alt="img">Conta</a></li>
+            <li><a href="/admin/produto/add"><img src="/img/add.png" alt="img">Produto</a></li>
+            <li><a href="/"><img src="/img/home.png" alt="img">Home</a></li>
+            <li><a href="/admin/logout"><img src="/img/logout.png" alt="img">Logout</a></li>
+        </ul>
+    </nav>
+
         {{#each error_msg}}
         <div class="alert alert-error">{{this}}</div>
         {{/each}}
@@ -44,7 +63,6 @@
         {{/each}}
         
     <main>
-        
         {{{body}}}
     </main>
     
@@ -52,4 +70,19 @@
         <p>&copy;2025 Site criado por <a href="https://tav1hh.github.io/Site-PortfolioV2/" target="_blac">Otávio Santiago</a></p>
     </footer>
 </body>
+<script>
+    // NavSide Lateral
+    function togglebar() {
+        const navside = document.getElementById('nav-side')
+        navside.classList.toggle('activate');
+    }
+
+    addEventListener('click', (event) => {
+        const navside = document.getElementById('nav-side')
+        const button_menu = document.getElementById('button-menu')
+        if (!button_menu.contains(event.target) && !navside.contains(event.target) ) {
+            navside.classList.remove('activate');
+        }
+    })
+</script>
 </html>

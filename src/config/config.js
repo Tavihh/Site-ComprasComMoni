@@ -33,6 +33,7 @@ const passport = require('passport')
     app.use(express.json())
     // public
     app.use(express.static(path.join(__dirname,'../public')))
+    app.set('views', 'src/views')
 
 
 module.exports = app
