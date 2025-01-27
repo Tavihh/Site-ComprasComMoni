@@ -13,7 +13,7 @@ app.use('/admin', (req,res,next)=>{
 },admin)
 
 app.get('/', (req, res)=>{
-    Produto.findAll().then((produto)=>{
+    Produto.findAll({order:[['createdAt','DESC']]}).then((produto)=>{
         produto = produto.map((item)=>{
             item = item.toJSON()
             const [precoInteiro, precoDecimal] = item.preco.split('.')
