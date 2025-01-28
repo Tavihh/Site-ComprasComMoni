@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./db')
+const Categoria = require('./Categoria')
 
 const Produto = sequelize.define('produtos',{
     nome:{
@@ -21,12 +22,13 @@ const Produto = sequelize.define('produtos',{
         type:DataTypes.TEXT,
         allowNull:false
     },
-    categoria:{
-        type:DataTypes.NUMBER,
-        allowNull:false
-    }
     
 },{freezeTableName:true})
+
+Produto.belongsTo(Categoria,{
+    foreignKey: 'categoria_id',
+    onUpdate: 'CASCADE',
+})
 
 Produto.sync().then(()=>{
     console.log("Tabela 'Produtos' OK")

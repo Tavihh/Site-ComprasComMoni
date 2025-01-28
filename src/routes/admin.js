@@ -27,7 +27,7 @@ const upload = multer({storage:storage})
 
 router.get('/', eAdmin, (req,res)=>{
     // buscando os produtos
-    Produto.findAll({limit:20,order:[['createdAt','desc']]}).then((produto)=>{
+    Produto.findAll({order:[['createdAt','desc']],include:[{model:Categoria,attributes:['id','nome']}]}).then((produto)=>{
         produto = produto.map(item=> item.toJSON())
         res.render('admin/index', {produto})
     // tratando o erro
@@ -213,7 +213,7 @@ router.post('/produto/add', eAdmin, (req, res) => {
                     path_foto: req.file.filename,
                     link: req.body.link.trim(),
                     telefone: user.telefone,
-                    categoria: req.body.categoria,
+                    categoria_id: req.body.categoria,
                 }).then(() => {
                     req.flash('success_msg', 'Produto salvo');
                     res.redirect('/admin');
@@ -257,7 +257,7 @@ router.post('/categoria/add', (req,res)=>{
 })
 
 router.get('/produto/editar/:id', eAdmin, (req,res)=>{
-    Produto.findOne({where:{id:req.params.id}}).then((produto)=>{
+    Produto.findOne({where:{id:req.params.id}}) .then((produto)=>{
         if(produto){
             Categoria.findAll().then((categoria)=>{
                 if(categoria){
@@ -286,7 +286,7 @@ router.post('/produto/editar/:id', eAdmin, (req,res)=>{
                 nome:req.body.nome.trim(),
                 preco:req.body.preco,
                 link:req.body.link.trim(),
-                categoria:req.body.categoria
+                categoria_id:req.body.categoria
             }).then(()=>{
                 req.flash('success_msg','Atualizado com sucesso')
                 res.redirect('/admin')
