@@ -9,7 +9,7 @@ Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por rev
 ## 🚀 Funcionalidades
 
 ✅ Listagem de produtos disponíveis para venda.  
-✅ Ao clicar em um produto, o usuário é redirecionado para o WhatsApp da revendedora.  
+✅ Ao clicar em um produto, o usuário é redirecionado para o Link ou o WhatsApp da revendedora.  
 ✅ Interface simples e intuitiva para facilitar a navegação.  
 
 ---
@@ -41,7 +41,7 @@ Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por rev
    ```bash
    npm install
    ```
-3. Configure o banco de dados no arquivo `.env`:
+3. Crie e configure o banco de dados no arquivo `.env` na raiz do projeto:
    ```env
    DB_HOST=localhost
    DB_DATABASE=seu_banco
@@ -58,7 +58,7 @@ Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por rev
 
 ## 📜 Como Funciona?
 1. O administrador cadastra os produtos no sistema.  
-2. Cada produto tem um **link personalizado** que redireciona o comprador para o WhatsApp da revendedora.  
+2. Cada produto tem a opção de colocar um **link personalizado** ou caso deixe em branco ele redireciona o comprador para o WhatsApp da revendedora.  
 3. O usuário escolhe um produto e, ao clicar, abre-se o WhatsApp já com uma mensagem pronta para contato.  
 
 ---
