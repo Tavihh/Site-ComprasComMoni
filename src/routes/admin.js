@@ -1,5 +1,5 @@
+// importações
 const router = require('express').Router()
-const passport = require('../config/auth')
 const bcrypt = require('bcryptjs')
 const User = require('../models/Users')
 const Produto = require('../models/Produto')
@@ -9,22 +9,12 @@ const { Op } = require('sequelize')
 const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
+const storage = require('../config/multer')
 
-
-// config multer
-const storage = multer.diskStorage({
-    destination:(req,file,cb)=>{
-        var pathFoto = path.join(__dirname,'../public/produtos')
-        cb(null,pathFoto)
-    },
-    filename:(req,file,cb)=>{
-        cb(null,new Date().getTime() + file.originalname)
-    }
-})
-
+// config upload
 const upload = multer({storage:storage})
 
-
+// rotas GET
 router.get('/', eAdmin, (req,res)=>{
     // buscando os produtos
     Produto.findAll({order:[['createdAt','desc']],include:[{model:Categoria,attributes:['id','nome']}]}).then((produto)=>{
@@ -37,19 +27,10 @@ router.get('/', eAdmin, (req,res)=>{
     })
 })
 
-router.post('/pesquisa', eAdmin, (req,res)=>{
-    Produto.findAll({where:{nome:{[Op.like]: `%${req.body.psq}%`}},order:[['createdAt','desc']],limit:20}).then((produto)=>{
-        produto = produto.map(item => item.toJSON())
-        res.render('admin/index',{produto})
-    }).catch((err)=>{
-        res.status(404).send('Ocorreu um erro ao carregar os produtos, tente novamente')
-    })
-})
-
 router.get('/editar', eAdmin, (req,res)=>{
     User.findOne({where:{id:req.user.id}}).then((user)=>{
         if(user){
-            res.render('admin/editarADM', {user:user.toJSON()})
+            res.render('admin//edit/editADM', {user:user.toJSON()})
         } else {
             req.flash('error_msg','Adiministrador não encontrado')
             res.redirect('/admin')
@@ -57,6 +38,76 @@ router.get('/editar', eAdmin, (req,res)=>{
     }).catch((err)=>{
         req.flash('error_msg','Não foi possivel fazer a busca no banco de dados')
         res.redirect('/admin')
+    })
+})
+
+router.get('/produto/add', eAdmin, (req,res)=>{
+    Categoria.findAll().then((categoria)=>{
+        categoria = categoria.map(item => item.toJSON())
+        res.render('admin/add/addProduto', {categoria})
+    })
+})
+
+router.get('/categoria/add', (req,res)=>{
+    res.render('admin/add/addCategoria')
+})
+
+router.get('/produto/editar/:id', eAdmin, (req,res)=>{
+    Produto.findOne({where:{id:req.params.id}}) .then((produto)=>{
+        if(produto){
+            Categoria.findAll().then((categoria)=>{
+                if(categoria){
+                    categoria = categoria.map(cat => {
+                        cat = cat.toJSON()
+                        cat.selected = cat.id == produto.categoria
+                        return cat
+                    })
+                    res.render('admin/edit/editProduto', {produto:produto.toJSON(), categoria})
+                }
+            })
+        } else{
+            req.flash('error_msg','Produto não encontrado')
+            res.redirect('/')
+        }
+    }).catch((err)=>{
+        req.flash('error_msg','Produto não encontrado')
+        res.redirect('/')
+    })
+})
+
+router.get('/produto/del/:id', eAdmin,(req,res)=>{
+
+    Produto.findOne({where:{id:req.params.id}}).then((produto)=>{
+        if(produto){
+            res.render('admin/confirmDel', {produto:produto.toJSON()})
+        } else {
+            req.flash('error_msg','Produto não encontrado')
+            res.redirect('/admin')
+        }
+    }).catch((err)=>{
+        req.flash('error_msg','Não foi possivel encontrar o produto')
+        res.redirect('/admin')
+    })
+})
+
+router.get('/cadastrar' , eAdmin, (req, res)=>{
+    res.render('admin/add/cadastrar')
+})
+
+router.get('/logout', (req,res)=>{
+    req.logout(()=>{
+        req.flash('success_msg','Deslogado com sucesso')
+        res.redirect('/')
+    })
+})
+
+// rotas POST
+router.post('/pesquisa', eAdmin, (req,res)=>{
+    Produto.findAll({where:{nome:{[Op.like]: `%${req.body.psq}%`}},order:[['createdAt','desc']],limit:20}).then((produto)=>{
+        produto = produto.map(item => item.toJSON())
+        res.render('admin/index',{produto})
+    }).catch((err)=>{
+        res.status(404).send('Ocorreu um erro ao carregar os produtos, tente novamente')
     })
 })
 
@@ -113,7 +164,7 @@ router.post('/atualizarSenha', (req,res) => {
     }
     // retornando os erros
     if(erros.length >= 1) {
-        res.render('usuario/editar', {erros})
+        res.render('admin/edit/editADM', {erros})
     } else {
         // verificando se email já existe
         User.findOne({where:{id:req.user.id}}).then((user)=>{
@@ -166,13 +217,6 @@ router.post('/atualizarSenha', (req,res) => {
     }
 })
 
-router.get('/produto/add', eAdmin, (req,res)=>{
-    Categoria.findAll().then((categoria)=>{
-        categoria = categoria.map(item => item.toJSON())
-        res.render('admin/addProduto', {categoria})
-    })
-})
-
 router.post('/produto/add', eAdmin, (req, res) => {
     let erros = [];
 
@@ -202,7 +246,7 @@ router.post('/produto/add', eAdmin, (req, res) => {
 
         // Se houver erros, renderiza a página novamente
         if (erros.length > 0) {
-            return res.render('/admin/produto/add', { erros });
+            return res.render('admin/add/addProduto', { erros });
         }
         User.findOne({where:{id:req.user.id}}).then((user)=>{
             if(user){
@@ -240,10 +284,6 @@ router.post('/produto/add', eAdmin, (req, res) => {
     })
 })
 
-router.get('/categoria/add', (req,res)=>{
-    res.render('admin/addCategoria')
-})
-
 router.post('/categoria/add', (req,res)=>{
     Categoria.create({
         nome:req.body.nome
@@ -253,29 +293,6 @@ router.post('/categoria/add', (req,res)=>{
     }).catch((err)=>{
         req.flash('error_msg','Não foi possivel criar a categoria')
         res.redirect('/categoria/add')
-    })
-})
-
-router.get('/produto/editar/:id', eAdmin, (req,res)=>{
-    Produto.findOne({where:{id:req.params.id}}) .then((produto)=>{
-        if(produto){
-            Categoria.findAll().then((categoria)=>{
-                if(categoria){
-                    categoria = categoria.map(cat => {
-                        cat = cat.toJSON()
-                        cat.selected = cat.id == produto.categoria
-                        return cat
-                    })
-                    res.render('admin/editProduto', {produto:produto.toJSON(), categoria})
-                }
-            })
-        } else{
-            req.flash('error_msg','Produto não encontrado')
-            res.redirect('/')
-        }
-    }).catch((err)=>{
-        req.flash('error_msg','Produto não encontrado')
-        res.redirect('/')
     })
 })
 
@@ -305,21 +322,6 @@ router.post('/produto/editar/:id', eAdmin, (req,res)=>{
     
 })
 
-router.get('/produto/del/:id', eAdmin,(req,res)=>{
-
-    Produto.findOne({where:{id:req.params.id}}).then((produto)=>{
-        if(produto){
-            res.render('admin/confirmDel', {produto:produto.toJSON()})
-        } else {
-            req.flash('error_msg','Produto não encontrado')
-            res.redirect('/admin')
-        }
-    }).catch((err)=>{
-        req.flash('error_msg','Não foi possivel encontrar o produto')
-        res.redirect('/admin')
-    })
-})
-
 router.post('/produto/confirmDel', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.body.id}}).then((produto)=>{
         if(produto){
@@ -343,10 +345,6 @@ router.post('/produto/confirmDel', eAdmin, (req,res)=>{
         req.flash('error_msg','Não foi possivel excluir o produto 1')
         res.redirect('/admin')
     })
-})
-
-router.get('/cadastrar' , eAdmin, (req, res)=>{
-    res.render('admin/cadastrar')
 })
 
 router.post('/cadastrar', eAdmin, (req,res)=>{
@@ -398,7 +396,7 @@ router.post('/cadastrar', eAdmin, (req,res)=>{
     }
 
     if(erros.length >= 1) {
-        res.render('/admin/cadastrar', {erros})
+        res.render('/admin/add/cadastrar', {erros})
     } else {
         User.findOne({where:{email:email}}).then((user)=>{
             if(user){
@@ -440,11 +438,5 @@ router.post('/cadastrar', eAdmin, (req,res)=>{
     }
 })
 
-router.get('/logout', (req,res)=>{
-    req.logout(()=>{
-        req.flash('success_msg','Deslogado com sucesso')
-        res.redirect('/')
-    })
-})
-
+// exportações
 module.exports = router

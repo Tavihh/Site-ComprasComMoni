@@ -8,6 +8,7 @@ const path = require('path')
 const passport = require('passport')
 
 // config
+process.noDeprecation = true
     // session
     app.use(session({
         secret:'comprascomMoni',
