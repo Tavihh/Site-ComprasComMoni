@@ -1,8 +1,8 @@
-# 📌 Marketplace para Revendedoras
+# 📌 Loja para Revendedoras
 
-Bem-vindo ao **Marketplace para Revendedoras**! 🛍️
+Bem-vindo ao **Loja para Revendedoras**! 🛍️
 
-Este projeto é um marketplace desenvolvido para facilitar a venda de produtos por revendedoras. Ao clicar em um produto, o usuário é direcionado automaticamente para o **WhatsApp** da revendedora responsável pela venda, garantindo um contato direto e rápido.
+Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por revendedoras. Ao clicar em um produto, o usuário é direcionado automaticamente para o **WhatsApp** da revendedora responsável pela venda, garantindo um contato direto e rápido.
 
 ---
 
