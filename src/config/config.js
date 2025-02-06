@@ -6,6 +6,7 @@ const session = require('express-session')
 const flash = require('connect-flash')
 const path = require('path')
 const passport = require('passport')
+const Loja = require('../models/Loja')
 
 // config
 process.noDeprecation = true
@@ -19,11 +20,15 @@ process.noDeprecation = true
     app.use(passport.session())
     app.use(flash())
     // middleware
-    app.use((req,res,next)=>{
-        res.locals.error_msg = req.flash('error_msg')
-        res.locals.success_msg = req.flash('success_msg')
-        res.locals.error = req.flash('error')
-        res.locals.user = req.user || null
+    app.use(async(req,res,next)=>{
+        res.locals.error_msg = await req.flash('error_msg')
+        res.locals.success_msg = await req.flash('success_msg')
+        res.locals.error = await req.flash('error')
+        res.locals.user = await req.user || null
+
+        // Layout da Loja
+        let loja = await Loja.findOne()
+        res.locals.loja = await loja.toJSON() 
         next()
     })
     // view engine

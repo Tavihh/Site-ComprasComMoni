@@ -10,11 +10,6 @@ const User = sequelize.define('users',{
         type:DataTypes.STRING,
         allowNull:false
     },
-    telefone:{
-        type:DataTypes.STRING,
-        unique: true,
-        allowNull:false
-    },
     email:{
         type:DataTypes.STRING,
         unique:true,

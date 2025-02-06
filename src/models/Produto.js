@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./db')
-const Categoria = require('./Categoria')
-const User = require('./Users')
+const Loja = require('./Loja')
 
 const Produto = sequelize.define('produtos',{
     nome:{
@@ -22,13 +21,8 @@ const Produto = sequelize.define('produtos',{
     
 },{freezeTableName:true})
 
-Produto.belongsTo(Categoria,{
-    foreignKey: 'categoria_id',
-    onUpdate: 'CASCADE',
-})
-
-Produto.belongsTo(User, {
-    foreignKey: 'telefone',
+Produto.belongsTo(Loja, {
+    foreignKey: 'fk_telefone',
     targetKey: 'telefone',
     onUpdate: 'CASCADE'
 })

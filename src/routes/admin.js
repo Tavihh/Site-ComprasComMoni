@@ -3,13 +3,13 @@ const router = require('express').Router()
 const bcrypt = require('bcryptjs')
 const User = require('../models/Users')
 const Produto = require('../models/Produto')
-const Categoria = require('../models/Categoria')
 const { eAdmin } = require('../helpers/eAdmin')
 const { Op } = require('sequelize')
 const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
 const storage = require('../config/multer')
+const Loja = require('../models/Loja')
 
 // config upload
 const upload = multer({storage:storage})
@@ -17,7 +17,7 @@ const upload = multer({storage:storage})
 // rotas GET
 router.get('/', eAdmin, (req,res)=>{
     // buscando os produtos
-    Produto.findAll({order:[['createdAt','desc']],include:[{model:Categoria,attributes:['id','nome']}]}).then((produto)=>{
+    Produto.findAll({order:[['createdAt','desc']]}).then((produto)=>{
         produto = produto.map(item=> item.toJSON())
         res.render('admin/index', {produto})
     // tratando o erro
@@ -28,43 +28,35 @@ router.get('/', eAdmin, (req,res)=>{
 })
 
 router.get('/editar', eAdmin, (req,res)=>{
-    User.findOne({where:{id:req.user.id}}).then((user)=>{
-        if(user){
-            res.render('admin//edit/editADM', {user:user.toJSON()})
+    Promise.all([
+        User.findOne({where:{id:req.user.id}}),
+        Loja.findOne()
+    ]).then(([user,loja]) => {
+        if(user) {
+            user = user.toJSON()
+            loja = loja.toJSON()
+            res.render('admin//edit/editADM', {user,loja})
         } else {
             req.flash('error_msg','Adiministrador não encontrado')
             res.redirect('/admin')
         }
     }).catch((err)=>{
+        console.log(err)
         req.flash('error_msg','Não foi possivel fazer a busca no banco de dados')
         res.redirect('/admin')
     })
 })
 
 router.get('/produto/add', eAdmin, (req,res)=>{
-    Categoria.findAll().then((categoria)=>{
-        categoria = categoria.map(item => item.toJSON())
-        res.render('admin/add/addProduto', {categoria})
-    })
-})
 
-router.get('/categoria/add', (req,res)=>{
-    res.render('admin/add/addCategoria')
+        res.render('admin/add/addProduto')
+
 })
 
 router.get('/produto/editar/:id', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.params.id}}) .then((produto)=>{
         if(produto){
-            Categoria.findAll().then((categoria)=>{
-                if(categoria){
-                    categoria = categoria.map(cat => {
-                        cat = cat.toJSON()
-                        cat.selected = cat.id == produto.categoria
-                        return cat
-                    })
-                    res.render('admin/edit/editProduto', {produto:produto.toJSON(), categoria})
-                }
-            })
+            res.render('admin/edit/editProduto', {produto:produto.toJSON()})
         } else{
             req.flash('error_msg','Produto não encontrado')
             res.redirect('/')
@@ -111,20 +103,42 @@ router.post('/pesquisa', eAdmin, (req,res)=>{
     })
 })
 
-router.post('/editar/:id', eAdmin, (req,res)=>{
-    User.findOne({where:{id:req.params.id}}).then((user)=>{
-        if(user){
+router.post('/editarLoja', eAdmin, (req,res)=>{
+    Loja.findOne().then((loja)=>{
+        if(loja){
             telefone = req.body.telefone
             // Remove todos os caracteres não numéricos (incluindo parênteses, hífens e espaços)
             telefone = telefone.replace(/[^\d]/g, ''); 
+            loja.update({
+                nome:req.body.nome,
+                telefone:telefone,
+            }).then(()=>{
+                req.flash('success_msg','Loja atualizada com sucesso!')
+                res.redirect('/admin')
+            }).catch((err)=>{
+                req.flash('error_msg','erro ao atualizar dados')
+                res.redirect('/admin')
+            })
+        } else {
+            req.flash('error_msg','Loja não encontrada')
+            res.redirect('/admin')
+        }
+    }).catch((err)=>{
+        req.flash('error_msg','Não foi possivel fazer a busca no banco de dados')
+        res.redirect('/admin')
+    })
+})
+
+router.post('/editar/:id', eAdmin, (req,res)=>{
+    User.findOne({where:{id:req.params.id}}).then((user)=>{
+        if(user){
             user.update({
                 nome:req.body.nome,
                 sobrenome:req.body.sobrenome,
-                telefone:telefone,
                 email:req.body.email
             }).then(()=>{
-                req.flash('success_msg','Administrador atualizado com sucesso!, faça login novamente')
-                res.redirect('/login')
+                req.flash('success_msg','Administrador atualizado com sucesso!')
+                res.redirect('/admin')
             }).catch((err)=>{
                 req.flash('error_msg','erro ao atualizar dados')
                 res.redirect('/admin')
@@ -139,7 +153,7 @@ router.post('/editar/:id', eAdmin, (req,res)=>{
     })
 })
 
-router.post('/atualizarSenha', (req,res) => {
+router.post('/atualizarSenha', eAdmin, (req,res) => {
     let senha = req.body.senha.trim()
     let newsenha = req.body.newsenha.trim()
     let newsenha2 = req.body.newsenha2.trim()
@@ -248,16 +262,15 @@ router.post('/produto/add', eAdmin, (req, res) => {
         if (erros.length > 0) {
             return res.render('admin/add/addProduto', { erros });
         }
-        User.findOne({where:{id:req.user.id}}).then((user)=>{
-            if(user){
+        Loja.findOne().then((loja)=>{
+            if(loja){
                 // Salva os dados no banco de dados
                 Produto.create({
                     nome: req.body.nome.trim(),
                     preco: req.body.preco,
                     path_foto: req.file.filename,
                     link: req.body.link.trim(),
-                    telefone: user.telefone,
-                    categoria_id: req.body.categoria,
+                    fk_telefone: loja.telefone,
                 }).then(() => {
                     req.flash('success_msg', 'Produto salvo');
                     res.redirect('/admin');
@@ -284,18 +297,6 @@ router.post('/produto/add', eAdmin, (req, res) => {
     })
 })
 
-router.post('/categoria/add', (req,res)=>{
-    Categoria.create({
-        nome:req.body.nome
-    }).then(()=>{
-        req.flash('success_msg','Categoria criada com sucesso')
-        res.redirect('/admin/produto/add')
-    }).catch((err)=>{
-        req.flash('error_msg','Não foi possivel criar a categoria')
-        res.redirect('/categoria/add')
-    })
-})
-
 router.post('/produto/editar/:id', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.params.id}}).then((produto)=>{
         if(produto){
@@ -303,7 +304,6 @@ router.post('/produto/editar/:id', eAdmin, (req,res)=>{
                 nome:req.body.nome.trim(),
                 preco:req.body.preco,
                 link:req.body.link.trim(),
-                categoria_id:req.body.categoria
             }).then(()=>{
                 req.flash('success_msg','Atualizado com sucesso')
                 res.redirect('/admin')

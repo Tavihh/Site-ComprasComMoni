@@ -17,12 +17,12 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compras Com Moni</title>
+    <title>{{loja.nome}}</title>
     <link rel="stylesheet" href="/css/layouts/main.css">
 </head>
 <body>
     <header>
-        <h1><a href="/login">Compras.comMoni</a></h1>
+        <h1><a href="/login">{{loja.nome}}</a></h1>
 
         <form action="/pesquisa" method="post">
         <input type="text" name="psq" id="psq" placeholder="Pesquisar Produto.." class="psq">
