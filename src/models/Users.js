@@ -12,6 +12,7 @@ const User = sequelize.define('users',{
     },
     telefone:{
         type:DataTypes.STRING,
+        unique: true,
         allowNull:false
     },
     email:{
@@ -25,7 +26,7 @@ const User = sequelize.define('users',{
     }
 },{freezeTableName:true})
 
-User.sync().then(()=>{
+User.sync({alter:true}).then(()=>{
     console.log("Tabela 'Users' OK")
 }).catch((err)=>{
     console.log("Tabela 'Users' Não OK, ERRO:",err)
