@@ -56,6 +56,10 @@ Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por rev
    ```bash
    npm run start
    ```
+6. Acesse o painel do site:
+   Clique no titulo do site para acessar a tela de login do painel
+   ```
+
 ## 📜 Como Funciona?
 1. O administrador cadastra os produtos no sistema.  
 2. Cada produto tem a opção de colocar um **link personalizado**, caso deixe em branco ele redireciona o comprador para o WhatsApp da revendedora.  
