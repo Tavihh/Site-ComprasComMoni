@@ -48,17 +48,17 @@ Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por rev
    DB_USER=seu_usuario
    DB_PASS=sua_senha
    ```
-4. Inicie o servidor:
+4. Inicie o setup:
    ```bash
-   npm start
+   npm run setup
    ```
-5. Acesse o projeto no navegador.
-
----
-
+5. Inicie o servidor:
+   ```bash
+   npm run start
+   ```
 ## 📜 Como Funciona?
 1. O administrador cadastra os produtos no sistema.  
-2. Cada produto tem a opção de colocar um **link personalizado** ou caso deixe em branco ele redireciona o comprador para o WhatsApp da revendedora.  
+2. Cada produto tem a opção de colocar um **link personalizado**, caso deixe em branco ele redireciona o comprador para o WhatsApp da revendedora.  
 3. O usuário escolhe um produto e, ao clicar, abre-se o WhatsApp já com uma mensagem pronta para contato.  
 
 ---
