@@ -14,9 +14,9 @@ a > img{
 }
 
 table{
+    border-radius: 10px;
+    overflow: hidden;
     border-collapse: collapse;
-    border: 1px solid black;
-
     width: 100%;
 }
 
@@ -29,7 +29,12 @@ table thead td{
 table td{
     cursor: pointer;
     text-align: center;
-    border: 1px solid black;
+    padding: 5px 0px;
+    border-bottom: 1px solid black;
+}
+
+table td:nth-child(3) {
+    width: 100px;
 }
 
 a{
@@ -37,13 +42,14 @@ a{
 }
 
 .imagem {
-    width: 100px;
+    width: 50px;
     overflow: hidden;
 }
 
 .imagem img{
-    width: 100px;
-    height: 100px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
     object-fit: cover;
     object-position: center center;
     display: block;
