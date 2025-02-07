@@ -26,7 +26,11 @@ table thead td{
     color: white;
 }
 
-table td{
+table tbody {
+    background-color: #f9f9f9;
+}
+
+table tbody td{
     cursor: pointer;
     text-align: center;
     padding: 5px 0px;
@@ -67,4 +71,10 @@ a{
 }
 .form-submit:hover, .form-file:hover{
     opacity: 1;
+}
+
+tfoot {
+    text-indent: 20px;
+    background-color: #333;
+    color: white;
 }

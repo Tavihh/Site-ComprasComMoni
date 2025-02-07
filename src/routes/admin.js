@@ -19,6 +19,7 @@ router.get('/', eAdmin, (req,res)=>{
     // buscando os produtos
     Produto.findAll({order:[['createdAt','desc']]}).then((produto)=>{
         produto = produto.map(item=> item.toJSON())
+        produto.total = produto.length
         res.render('admin/index', {produto})
     // tratando o erro
     }).catch((err)=>{
