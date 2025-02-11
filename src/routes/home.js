@@ -9,13 +9,14 @@ router.get('/', (req, res)=>{
     Produto.findAll({order:[['createdAt','DESC']]}).then((produto)=>{
         produto = produto.map((item)=>{
             item = item.toJSON()
-            const [precoInteiro, precoDecimal] = item.preco.split('.')
+            const [precoInteiro, precoDecimal] = item.preco.toString().split('.')
             item.precoInteiro = precoInteiro
             item.precoDecimal = precoDecimal
             return item
         })
         res.render('home/index',{produto})
     }).catch((err)=>{
+        console.log(err)
         res.status(404).send('Ocorreu um erro ao carregar os produtos, tente novamente')
     })
 })
@@ -33,13 +34,14 @@ router.post('/pesquisa', (req,res)=>{
     Produto.findAll({where:{nome:{[Op.like]: `%${req.body.psq}%`}}}).then((produto)=>{
         produto = produto.map((item)=>{
             item = item.toJSON()
-            const [precoInteiro, precoDecimal] = item.preco.split('.')
+            const [precoInteiro, precoDecimal] = item.preco.toString().split('.')
             item.precoInteiro = precoInteiro
             item.precoDecimal = precoDecimal
             return item
         })
         res.render('home/index',{produto})
     }).catch((err)=>{
+        console.log(err)
         res.status(404).send('Ocorreu um erro ao carregar os produtos, tente novamente')
     })
 })
