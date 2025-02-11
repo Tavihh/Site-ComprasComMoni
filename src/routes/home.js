@@ -9,7 +9,7 @@ router.get('/', (req, res)=>{
     Produto.findAll({order:[['createdAt','DESC']]}).then((produto)=>{
         produto = produto.map((item)=>{
             item = item.toJSON()
-            const [precoInteiro, precoDecimal] = item.preco.toString().split('.')
+            const [precoInteiro, precoDecimal] = item.preco.toFixed(2).toString().split('.')
             item.precoInteiro = precoInteiro
             item.precoDecimal = precoDecimal
             return item
@@ -34,7 +34,7 @@ router.post('/pesquisa', (req,res)=>{
     Produto.findAll({where:{nome:{[Op.like]: `%${req.body.psq}%`}}}).then((produto)=>{
         produto = produto.map((item)=>{
             item = item.toJSON()
-            const [precoInteiro, precoDecimal] = item.preco.toString().split('.')
+            const [precoInteiro, precoDecimal] = item.preco.toFixed(2).toString().split('.')
             item.precoInteiro = precoInteiro
             item.precoDecimal = precoDecimal
             return item

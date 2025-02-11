@@ -8,7 +8,7 @@ const Produto = sequelize.define('produtos',{
         allowNull:false
     },
     preco:{
-        type:DataTypes.DECIMAL(10,2),
+        type:DataTypes.REAL,
         allowNull:false
     },
     path_foto:{
