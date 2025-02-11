@@ -18,7 +18,11 @@ const upload = multer({storage:storage})
 router.get('/', eAdmin, (req,res)=>{
     // buscando os produtos
     Produto.findAll({order:[['createdAt','desc']]}).then((produto)=>{
-        produto = produto.map(item=> item.toJSON())
+        produto = produto.map(item => {
+            item = item.toJSON()
+            item.preco = item.preco.toFixed(2)
+            return item
+        })
         produto.total = produto.length
         res.render('admin/index', {produto})
     // tratando o erro
@@ -49,15 +53,16 @@ router.get('/editar', eAdmin, (req,res)=>{
 })
 
 router.get('/produto/add', eAdmin, (req,res)=>{
-
-        res.render('admin/add/addProduto')
+    res.render('admin/add/addProduto')
 
 })
 
 router.get('/produto/editar/:id', eAdmin, (req,res)=>{
     Produto.findOne({where:{id:req.params.id}}) .then((produto)=>{
         if(produto){
-            res.render('admin/edit/editProduto', {produto:produto.toJSON()})
+            produto = produto.toJSON()
+            produto.preco = produto.preco.toFixed(2)
+            res.render('admin/edit/editProduto', {produto})
         } else{
             req.flash('error_msg','Produto não encontrado')
             res.redirect('/')

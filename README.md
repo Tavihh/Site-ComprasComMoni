@@ -18,7 +18,7 @@ Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por rev
 
 - **HTML, CSS e JavaScript** para a interface do usuário.  
 - **Node.js com Express** para o backend.  
-- **Sequelize e MySQL2** para a gestão do banco de dados.  
+- **Sequelize e SQLite3** para a gestão do banco de dados.  
 - **Express-Handlebars** para templates dinâmicos.  
 - **Passport e bcryptjs** para autenticação e segurança.  
 - **Multer** para upload de arquivos.  
@@ -35,28 +35,21 @@ Este projeto é uma Loja desenvolvido para facilitar a venda de produtos por rev
 ### 🔹 Passos
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/Tavihh/Site-ComprasComMoni
+   git clone https://github.com/Tavihh/Site-Revendedora
    ```
 2. Instale as dependências do projeto:
    ```bash
    npm install
    ```
-3. Crie e configure o banco de dados no arquivo `.env` na raiz do projeto:
-   ```env
-   DB_HOST=localhost
-   DB_DATABASE=seu_banco
-   DB_USER=seu_usuario
-   DB_PASS=sua_senha
-   ```
-4. Inicie o setup:
+3. Inicie o setup:
    ```bash
    npm run setup
    ```
-5. Inicie o servidor:
+4. Inicie o servidor:
    ```bash
    npm run start
    ```
-6. Acesse o painel do site clicando no titulo do site para acessar a tela de login do painel
+5. Acesse o painel do site clicando no titulo do site para acessar a tela de login do painel
 
 ## 📜 Como Funciona?
 1. O administrador cadastra os produtos no sistema.  
